@@ -1,0 +1,532 @@
+import React, { useState, useEffect } from 'react';
+import { Calendar, CheckSquare, TrendingUp, Brain, Heart, Plus, Settings, Bell, Target, Clock, Zap, BookOpen, Users, Award } from 'lucide-react';
+
+const Plantrix = () => {
+  const [currentView, setCurrentView] = useState('dashboard');
+  const [tasks, setTasks] = useState([
+    { id: 1, title: 'Complete React Assignment', subject: 'Computer Science', priority: 'high', dueDate: '2025-08-28', completed: false, estimatedTime: 120 },
+    { id: 2, title: 'Review Calculus Chapter 5', subject: 'Mathematics', priority: 'medium', dueDate: '2025-08-29', completed: false, estimatedTime: 90 },
+    { id: 3, title: 'Physics Lab Report', subject: 'Physics', priority: 'high', dueDate: '2025-08-30', completed: true, estimatedTime: 60 }
+  ]);
+  const [healthData, setHealthData] = useState({
+    sleep: 7.5,
+    water: 6,
+    exercise: 30,
+    stress: 3,
+    mood: 4
+  });
+  const [studySession, setStudySession] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+
+  // Pomodoro timer effect
+  useEffect(() => {
+    let interval = null;
+    if (studySession && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(time => time - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && studySession) {
+      setStudySession(null);
+      // Show completion notification
+    }
+    return () => clearInterval(interval);
+  }, [studySession, timeLeft]);
+
+  const toggleTask = (id) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
+  };
+
+  const startStudySession = (task, duration = 25) => {
+    setStudySession(task);
+    setTimeLeft(duration * 60);
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return ${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')};
+  };
+
+  const DashboardView = () => (
+    <div className="space-y-6">
+      {/* Welcome Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 text-white">
+        <h1 className="text-2xl font-bold mb-2">Good morning, Alex! 🌟</h1>
+        <p className="text-blue-100">Ready to make today productive? You have 3 pending tasks and your energy level looks great!</p>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Today's Focus</p>
+              <p className="text-2xl font-bold text-green-600">2h 30m</p>
+            </div>
+            <Brain className="w-8 h-8 text-green-500" />
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Tasks Done</p>
+              <p className="text-2xl font-bold text-blue-600">1/4</p>
+            </div>
+            <CheckSquare className="w-8 h-8 text-blue-500" />
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Wellness</p>
+              <p className="text-2xl font-bold text-purple-600">85%</p>
+            </div>
+            <Heart className="w-8 h-8 text-purple-500" />
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Streak</p>
+              <p className="text-2xl font-bold text-orange-600">7 days</p>
+            </div>
+            <Award className="w-8 h-8 text-orange-500" />
+          </div>
+        </div>
+      </div>
+
+      {/* Study Session Timer */}
+      {studySession && (
+        <div className="bg-gradient-to-r from-green-500 to-teal-500 rounded-xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold">Studying: {studySession.title}</h3>
+              <p className="text-green-100">Stay focused! You're doing great.</p>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold">{formatTime(timeLeft)}</div>
+              <button 
+                onClick={() => setStudySession(null)}
+                className="mt-2 px-4 py-1 bg-white bg-opacity-20 rounded-lg text-sm hover:bg-opacity-30 transition-colors"
+              >
+                Stop Session
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Recommendations */}
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          <Zap className="w-5 h-5 text-yellow-500 mr-2" />
+          AI Recommendations
+        </h3>
+        <div className="space-y-3">
+          <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+            <Target className="w-5 h-5 text-blue-500 mt-0.5" />
+            <div>
+              <p className="font-medium text-blue-900">Optimal Study Time</p>
+              <p className="text-sm text-blue-700">Based on your energy patterns, 2-4 PM is your peak focus time today.</p>
+            </div>
+          </div>
+          <div className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
+            <Heart className="w-5 h-5 text-green-500 mt-0.5" />
+            <div>
+              <p className="font-medium text-green-900">Health Reminder</p>
+              <p className="text-sm text-green-700">You're doing well! Remember to drink more water and take a 10-minute walk.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Task Overview */}
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Today's Priority Tasks</h3>
+          <button 
+            onClick={() => setCurrentView('tasks')}
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          >
+            View All
+          </button>
+        </div>
+        <div className="space-y-3">
+          {tasks.filter(task => !task.completed).slice(0, 3).map(task => (
+            <div key={task.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <input
+                type="checkbox"
+                checked={task.completed}
+                onChange={() => toggleTask(task.id)}
+                className="w-4 h-4 text-blue-600 rounded"
+              />
+              <div className="flex-1">
+                <p className="font-medium">{task.title}</p>
+                <p className="text-sm text-gray-600">{task.subject} • {task.estimatedTime}min</p>
+              </div>
+              <button
+                onClick={() => startStudySession(task)}
+                className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors"
+              >
+                Start
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const TasksView = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Smart To-Do Lists</h2>
+        <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <Plus className="w-4 h-4" />
+          <span>Add Task</span>
+        </button>
+      </div>
+
+      <div className="grid gap-4">
+        {tasks.map(task => (
+          <div key={task.id} className={bg-white rounded-xl p-4 shadow-sm border ${task.completed ? 'border-green-200 bg-green-50' : 'border-gray-100'}}>
+            <div className="flex items-center space-x-4">
+              <input
+                type="checkbox"
+                checked={task.completed}
+                onChange={() => toggleTask(task.id)}
+                className="w-5 h-5 text-blue-600 rounded"
+              />
+              <div className="flex-1">
+                <h3 className={font-semibold ${task.completed ? 'line-through text-gray-500' : ''}}>
+                  {task.title}
+                </h3>
+                <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600">
+                  <span>{task.subject}</span>
+                  <span className="flex items-center">
+                    <Clock className="w-4 h-4 mr-1" />
+                    {task.estimatedTime}min
+                  </span>
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    task.priority === 'high' ? 'bg-red-100 text-red-700' :
+                    task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                    'bg-green-100 text-green-700'
+                  }`}>
+                    {task.priority}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-500">Due: {task.dueDate}</span>
+                {!task.completed && (
+                  <button
+                    onClick={() => startStudySession(task)}
+                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors"
+                  >
+                    Start Focus
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const StudyView = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Smart Study Plans</h2>
+      
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <h3 className="text-lg font-semibold mb-4">Today's Study Schedule</h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+            <div>
+              <h4 className="font-medium">Morning Focus Block</h4>
+              <p className="text-sm text-gray-600">9:00 AM - 11:00 AM • High Energy Period</p>
+            </div>
+            <div className="text-right">
+              <p className="font-medium text-blue-600">Computer Science</p>
+              <p className="text-sm text-gray-500">React Assignment</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+            <div>
+              <h4 className="font-medium">Afternoon Review</h4>
+              <p className="text-sm text-gray-600">2:00 PM - 3:30 PM • Peak Focus Time</p>
+            </div>
+            <div className="text-right">
+              <p className="font-medium text-green-600">Mathematics</p>
+              <p className="text-sm text-gray-500">Calculus Review</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+            <div>
+              <h4 className="font-medium">Evening Prep</h4>
+              <p className="text-sm text-gray-600">7:00 PM - 8:00 PM • Light Study Period</p>
+            </div>
+            <div className="text-right">
+              <p className="font-medium text-purple-600">Physics</p>
+              <p className="text-sm text-gray-500">Lab Report Draft</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <BookOpen className="w-5 h-5 text-blue-500 mr-2" />
+            Study Techniques
+          </h3>
+          <div className="space-y-3">
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <h4 className="font-medium">Pomodoro Timer</h4>
+              <p className="text-sm text-gray-600">25min focused sessions with 5min breaks</p>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <h4 className="font-medium">Spaced Repetition</h4>
+              <p className="text-sm text-gray-600">Review material at increasing intervals</p>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <h4 className="font-medium">Active Recall</h4>
+              <p className="text-sm text-gray-600">Test yourself without looking at notes</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <TrendingUp className="w-5 h-5 text-green-500 mr-2" />
+            Study Analytics
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span>Weekly Study Time</span>
+                <span>18h 30m / 20h</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-green-500 h-2 rounded-full" style={{width: '92%'}}></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span>Focus Accuracy</span>
+                <span>87%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-blue-500 h-2 rounded-full" style={{width: '87%'}}></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span>Task Completion</span>
+                <span>75%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-purple-500 h-2 rounded-full" style={{width: '75%'}}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const HealthView = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Health & Wellness Tracking</h2>
+      
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Sleep Quality</h3>
+            <div className="text-2xl font-bold text-blue-600">{healthData.sleep}h</div>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+            <div className="bg-blue-500 h-3 rounded-full" style={{width: ${(healthData.sleep/12)*100}%}}></div>
+          </div>
+          <p className="text-sm text-gray-600">Target: 7-9 hours • Great job!</p>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Water Intake</h3>
+            <div className="text-2xl font-bold text-blue-600">{healthData.water}</div>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+            <div className="bg-cyan-500 h-3 rounded-full" style={{width: ${(healthData.water/8)*100}%}}></div>
+          </div>
+          <p className="text-sm text-gray-600">Target: 8 glasses • 2 more to go</p>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Exercise</h3>
+            <div className="text-2xl font-bold text-green-600">{healthData.exercise}min</div>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+            <div className="bg-green-500 h-3 rounded-full" style={{width: ${(healthData.exercise/60)*100}%}}></div>
+          </div>
+          <p className="text-sm text-gray-600">Target: 60 minutes • Halfway there!</p>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Stress Level</h3>
+            <div className="text-2xl font-bold text-orange-600">{healthData.stress}/5</div>
+          </div>
+          <div className="flex space-x-1 mb-2">
+            {[1,2,3,4,5].map(i => (
+              <div key={i} className={h-3 flex-1 rounded ${i <= healthData.stress ? 'bg-orange-500' : 'bg-gray-200'}}></div>
+            ))}
+          </div>
+          <p className="text-sm text-gray-600">Moderate • Consider a break</p>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Mood</h3>
+            <div className="text-2xl font-bold text-purple-600">{healthData.mood}/5</div>
+          </div>
+          <div className="flex space-x-1 mb-2">
+            {[1,2,3,4,5].map(i => (
+              <div key={i} className={h-3 flex-1 rounded ${i <= healthData.mood ? 'bg-purple-500' : 'bg-gray-200'}}></div>
+            ))}
+          </div>
+          <p className="text-sm text-gray-600">Good • Keep it up!</p>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+          <div className="space-y-2">
+            <button 
+              onClick={() => setHealthData({...healthData, water: Math.min(8, healthData.water + 1)})}
+              className="w-full px-3 py-2 bg-cyan-100 text-cyan-700 rounded-lg text-sm hover:bg-cyan-200 transition-colors"
+            >
+              + Log Water
+            </button>
+            <button 
+              onClick={() => setHealthData({...healthData, exercise: healthData.exercise + 15})}
+              className="w-full px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm hover:bg-green-200 transition-colors"
+            >
+              + 15min Exercise
+            </button>
+            <button className="w-full px-3 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm hover:bg-purple-200 transition-colors">
+              Log Mood
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <h3 className="text-lg font-semibold mb-4">Wellness Insights</h3>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <div className="p-4 bg-green-50 rounded-lg">
+              <h4 className="font-medium text-green-900 mb-2">✨ Wellness Streak</h4>
+              <p className="text-sm text-green-700">You've maintained healthy habits for 7 days straight! Your sleep and exercise patterns are improving your focus by 23%.</p>
+            </div>
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <h4 className="font-medium text-blue-900 mb-2">💧 Hydration Reminder</h4>
+              <p className="text-sm text-blue-700">You're doing well! Studies show that students who stay hydrated perform 15% better on cognitive tasks.</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="p-4 bg-orange-50 rounded-lg">
+              <h4 className="font-medium text-orange-900 mb-2">🧘 Stress Management</h4>
+              <p className="text-sm text-orange-700">Your stress levels are manageable. Try a 5-minute breathing exercise before your next study session.</p>
+            </div>
+            <div className="p-4 bg-purple-50 rounded-lg">
+              <h4 className="font-medium text-purple-900 mb-2">😊 Mood Boost</h4>
+              <p className="text-sm text-purple-700">Your mood has been consistently positive! This correlates with better learning retention and creativity.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">P</span>
+            </div>
+            <h1 className="text-xl font-bold text-gray-800">Plantrix</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Bell className="w-5 h-5 text-gray-500 hover:text-gray-700 cursor-pointer" />
+            <Settings className="w-5 h-5 text-gray-500 hover:text-gray-700 cursor-pointer" />
+            <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+              A
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar */}
+        <nav className="w-64 bg-white h-screen border-r border-gray-200 p-4">
+          <div className="space-y-2">
+            {[
+              { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
+              { id: 'tasks', label: 'Smart Tasks', icon: CheckSquare },
+              { id: 'study', label: 'Study Plans', icon: Brain },
+              { id: 'health', label: 'Wellness', icon: Heart },
+            ].map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setCurrentView(id)}
+                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                  currentView === id 
+                    ? 'bg-blue-100 text-blue-700 font-medium' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Progress Summary */}
+          <div className="mt-8 p-4 bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl">
+            <h3 className="font-semibold text-gray-800 mb-2">Today's Progress</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Tasks</span>
+                <span className="font-medium">1/4</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Study Time</span>
+                <span className="font-medium">2.5h</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Wellness</span>
+                <span className="font-medium">85%</span>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        {/* Main Content */}
+        <main className="flex-1 p-6">
+          {currentView === 'dashboard' && <DashboardView />}
+          {currentView === 'tasks' && <TasksView />}
+          {currentView === 'study' && <StudyView />}
+          {currentView === 'health' && <HealthView />}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Plantrix;
